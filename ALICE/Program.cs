@@ -40,7 +40,17 @@ namespace ALICE
             string executablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             string obs_filePath = Path.Combine(executablePath, obs_filename);
             string vc_redist_filepath = Path.Combine(executablePath, vc_redist_filename);
-            
+            string firstWebcamDeviceId = GetFirstWebcamDeviceID();
+
+            if (firstWebcamDeviceId != null)
+            {
+                Console.WriteLine("First webcam device ID: " + firstWebcamDeviceId);
+            }
+            else
+            {
+                Console.WriteLine("No webcam devices found.");
+                Environment.Exit(1);
+            }
 
             
             if (!File.Exists(obs_filePath))
@@ -178,6 +188,21 @@ namespace ALICE
             installerProcess.Start();
             installerProcess.WaitForExit();
             Console.WriteLine("Installer finished.");
+        }
+
+        static string GetFirstWebcamDeviceID()
+        {
+            FilterInfoCollection videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+
+            if (videoDevices.Count > 0)
+            {
+                FilterInfo firstDevice = videoDevices[0];
+                return firstDevice.MonikerString;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
